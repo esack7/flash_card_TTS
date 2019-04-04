@@ -1,4 +1,4 @@
-# flash_card_tts
+# Flash Card Text-to-Speech App
 
 ## Project setup
 ```
