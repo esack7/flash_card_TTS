@@ -52,80 +52,82 @@
 
 <script>
 export default {
-  name: "app",
-  data: () => {
-    return {
-      synth: window.speechSynthesis,
-      voices: [],
-      rate: 1,
-      pitch: 1
-    };
-  },
+  name: 'app',
+  data: () => ({
+    synth: window.speechSynthesis,
+    voices: [],
+    rate: 1,
+    pitch: 1,
+  }),
   methods: {
-    handleChange: function(e) {
+    handleChange(e) {
       const { value, id } = e.target;
-      if (id === "rate") {
+      if (id === 'rate') {
         this.rate = value;
         return null;
       }
       this.pitch = value;
       return null;
     },
-    getVoices: function() {
+    getVoices() {
       this.voices = this.synth.getVoices();
       if (this.voices.length > 0) {
-        this.voices.map(voice => {
-          const option = document.createElement("option");
+        this.voices.map((voice) => {
+          const option = document.createElement('option');
 
           option.textContent = `${voice.name}(${voice.lang})`;
-          option.setAttribute("data-lang", voice.lang);
-          option.setAttribute("data-name", voice.name);
+          option.setAttribute('data-lang', voice.lang);
+          option.setAttribute('data-name', voice.name);
           this.voiceSelect.appendChild(option);
+          return null;
         });
       }
     },
-    speak: function() {
-      const { synth, textInput, voices, voiceSelect } = this;
+    speak() {
+      const {
+        synth, textInput, voices, voiceSelect,
+      } = this;
       if (synth.speaking) {
-        console.error("Already speaking...");
+        console.error('Already speaking...');
         return;
       }
-      if (textInput.value !== "") {
+      if (textInput.value !== '') {
         const speakText = new SpeechSynthesisUtterance(textInput.value);
 
-        speakText.onend = e => {
-          console.log("Done speaking...");
+        speakText.onend = () => {
+          console.log('Done speaking...');
         };
 
-        speakText.onerror = err => {
-          console.log("Something went wrong speaking:\n", err);
+        speakText.onerror = (err) => {
+          console.log('Something went wrong speaking:\n', err);
         };
 
         const selectedVoice = voiceSelect.selectedOptions[0].getAttribute(
-          "data-name"
+          'data-name',
         );
 
-        voices.map(voice => {
+        voices.map((voice) => {
           if (voice.name === selectedVoice) {
             speakText.voice = voice;
           }
+          return null;
         });
-        speakText.rate = rate.value;
-        speakText.pitch = pitch.value;
+        speakText.rate = this.rate.value;
+        speakText.pitch = this.pitch.value;
 
         synth.speak(speakText);
       }
-    }
+    },
   },
-  mounted: function() {
-    this.voiceSelect = document.getElementById("voice-select");
-    this.textInput = document.getElementById("text-input");
+  mounted() {
+    this.voiceSelect = document.getElementById('voice-select');
+    this.textInput = document.getElementById('text-input');
     this.getVoices();
 
     if (this.synth.onvoiceschanged !== undefined) {
       this.synth.onvoiceschanged = this.getVoices;
     }
-  }
+  },
 };
 </script>
 
