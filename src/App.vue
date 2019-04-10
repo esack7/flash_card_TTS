@@ -2,7 +2,7 @@
   <div id="app" class="container text-center">
     <h1 class="mb-5">Text To Speech</h1>
     <div class="row">
-      <div class="col-md-6 mx-auto">
+      <div class="col-lg-6 mx-auto">
         <form>
           <div class="form-group">
             <textarea
@@ -43,7 +43,11 @@
           <div class="form-group">
             <select name id="voice-select" class="form-control form-control-lg"></select>
           </div>
-          <button v-on:click.prevent="speak" class="btn btn-light btn-lg btn-block">Speak</button>
+          <button v-on:click.prevent="speak" class="btn btn-success btn-lg btn-block">Speak</button>
+          <button v-on:click.prevent="togglePause"
+                  class="btn btn-info btn-lg btn-block"
+          >{{pauseStatus}}</button>
+          <button v-on:click.prevent="stop" class="btn btn-danger btn-lg btn-block">Stop</button>
         </form>
       </div>
     </div>
@@ -58,6 +62,7 @@ export default {
     voices: [],
     rate: 1,
     pitch: 1,
+    pauseStatus: 'Pause',
   }),
   methods: {
     handleChange(e) {
@@ -112,11 +117,29 @@ export default {
           }
           return null;
         });
-        speakText.rate = this.rate.value;
-        speakText.pitch = this.pitch.value;
+        speakText.rate = this.rate;
+        speakText.pitch = this.pitch;
 
         synth.speak(speakText);
+        console.log('Speaking...');
       }
+    },
+    stop() {
+      this.synth.cancel();
+      this.pauseStatus = 'Pause';
+    },
+    togglePause() {
+      const { synth } = this;
+      if (!synth.speaking && !synth.paused) {
+        return;
+      }
+      if (this.pauseStatus === 'Pause') {
+        synth.pause();
+        this.pauseStatus = 'Resume';
+        return;
+      }
+      synth.resume();
+      this.pauseStatus = 'Pause';
     },
   },
   mounted() {
@@ -133,7 +156,11 @@ export default {
 
 <style >
 #app {
-  background-color: #000;
+  height: 100%;
+  max-width: 100%;
   color: #fff;
+}
+textarea#text-input {
+  height: 40vh;
 }
 </style>
