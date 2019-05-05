@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="container text-center">
-    <h1 class="mb-5">Text To Speech</h1>
+    <h1 class="mb-3">Text To Speech</h1>
     <div class="row">
       <div class="col-lg-6 mx-auto">
         <form>
@@ -48,6 +48,10 @@
                   class="btn btn-info btn-lg btn-block"
           >{{pauseStatus}}</button>
           <button v-on:click.prevent="stop" class="btn btn-danger btn-lg btn-block">Stop</button>
+          <label for="toggleRepeat" class="toggle-repeat mt-1">
+            Repeat
+            <input type="checkbox" id="toggleRepeat" class="toggle-repeat_input" v-model="repeat"/>
+          </label>
         </form>
       </div>
     </div>
@@ -63,6 +67,8 @@ export default {
     rate: 1,
     pitch: 1,
     pauseStatus: 'Pause',
+    repeat: false,
+    manualStop: false,
   }),
   methods: {
     handleChange(e) {
@@ -90,7 +96,7 @@ export default {
     },
     speak() {
       const {
-        synth, textInput, voices, voiceSelect,
+        synth, textInput, voices, voiceSelect, repeat,
       } = this;
       if (synth.speaking) {
         console.error('Already speaking...');
@@ -100,6 +106,9 @@ export default {
         const speakText = new SpeechSynthesisUtterance(textInput.value);
 
         speakText.onend = () => {
+          if (repeat) {
+            this.speak();
+          }
           console.log('Done speaking...');
         };
 
@@ -125,8 +134,9 @@ export default {
       }
     },
     stop() {
-      this.synth.cancel();
+      this.repeat = false;
       this.pauseStatus = 'Pause';
+      this.synth.cancel();
     },
     togglePause() {
       const { synth } = this;
