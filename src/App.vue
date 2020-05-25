@@ -109,7 +109,10 @@ export default {
         return;
       }
       if (textInput.value !== '') {
-        const speakText = new SpeechSynthesisUtterance(textInput.value);
+        let updatedText = textInput.value.split('\n').join(';\n');
+        updatedText = updatedText.split('(').join('; (');
+        updatedText = updatedText.split(')').join(');');
+        const speakText = new SpeechSynthesisUtterance(updatedText);
 
         speakText.onend = () => {
           if (repeat) {
